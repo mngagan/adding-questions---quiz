@@ -67,6 +67,7 @@ class App extends Component {
     this.optionB.value = "";
     this.optionC.value = "";
     this.optionD.value = "";
+    this.selectAnswer.value = '';
   };
 
   render() {
