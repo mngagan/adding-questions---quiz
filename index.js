@@ -67,7 +67,26 @@ class App extends Component {
     this.optionB.value = "";
     this.optionC.value = "";
     this.optionD.value = "";
-    this.selectAnswer.value = '';
+    this.selectAnswer.value = "";
+  };
+
+  handleUploadQuestion = () => {
+
+    let param1 = {
+      timestamp : new Date().getTime(),
+      ques : this.state.questions
+    }
+    var xhr = new XMLHttpRequest();
+    xhr.open(
+      "POST",
+      "https://pqt1i0myrj.execute-api.ap-south-1.amazonaws.com/dev/quiz-1/"
+    );
+    xhr.onreadystatechange = function(event) {
+      console.log(event.target.response);
+      document.getElementById("test").innerHTML = event.target.response;
+    };
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.send(JSON.stringify(param1));
   };
 
   render() {
@@ -116,6 +135,12 @@ class App extends Component {
         </select>
         <br />
         <button onClick={() => this.handleAddQuestion()}>add question</button>
+        <hr />
+        <hr />
+        <hr />
+        <button onClick={() => this.handleUploadQuestion()}>
+          upload question
+        </button>
         <ToastContainer />
       </div>
     );
