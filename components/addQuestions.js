@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 import { render } from "react-dom";
 import "../style.css";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { validateQuestion } from "../utils/validateQuestion";
+import {toast} from '../utils/toast'
 
 let toastOptions = {
   position: "bottom-right",
@@ -27,12 +28,13 @@ class AddQuestions extends Component {
   }
 
   handleToast = arg => {
-    let { type, msg } = arg;
-    if (type == "error") {
-      toast.error(msg, toastOptions);
-    } else if (type == "success") {
-      toast.success(msg, toastOptions);
-    }
+    toast(arg)
+    // let { type, msg } = arg;
+    // if (type == "error") {
+    //   toast.error(msg, toastOptions);
+    // } else if (type == "success") {
+    //   toast.success(msg, toastOptions);
+    // }
   };
 
   handleAddQuestion = () => {
