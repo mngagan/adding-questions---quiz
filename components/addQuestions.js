@@ -6,6 +6,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { validateQuestion } from "../utils/validateQuestion";
 import { toast } from "../utils/toast";
 const axios = require("axios");
+import { Button } from "semantic-ui-react";
+import { Form, TextArea } from "semantic-ui-react";
 
 class AddQuestions extends Component {
   constructor() {
@@ -14,7 +16,12 @@ class AddQuestions extends Component {
     this.state = {
       name: "React",
       questions: [],
-      quizTopic: "quiz topic"
+      quizTopic: "quiz topic",
+      isUploading: false,
+      currentQuestion : {
+        name : '',
+        options : []
+      }
     };
   }
 
@@ -24,7 +31,7 @@ class AddQuestions extends Component {
 
   handleAddQuestion = () => {
     let result = {
-      name: this.questionNameRef.value,
+      name: this.state.currentQuestion.name,
       ansList: [
         this.optionA.value,
         this.optionB.value,
@@ -33,9 +40,11 @@ class AddQuestions extends Component {
       ],
       anwser: this.selectAnswer.value
     };
+    console.log(result)
+    
     let isValid = validateQuestion(result);
     if (isValid.success) {
-      toast.success('Questions added succesfully')
+      toast.success("Questions added succesfully");
       let questions = this.state.questions;
       questions.push(result);
       this.setState({
@@ -44,13 +53,13 @@ class AddQuestions extends Component {
       this.resetAllValues();
       return;
     } else {
-      toast.error(isValid.msg)
+      toast.error(isValid.msg);
       return;
     }
     console.log(result);
   };
   resetAllValues = () => {
-    this.questionNameRef.value = "";
+    this.questionNameRef.ref.value = "";
     this.optionA.value = "";
     this.optionB.value = "";
     this.optionC.value = "";
@@ -59,39 +68,67 @@ class AddQuestions extends Component {
   };
 
   handleUploadQuestion = () => {
+    this.setState({
+      isUploading: true
+    });
     let param = {
       questions: this.state.questions,
-      topic : 'topic'
+      topic: "topic"
     };
+    let that = this;
 
     axios
       .post(
-        "https://pqt1i0myrj.execute-api.ap-south-1.amazonaws.com/dev/quiz-1/", param
+        "https://pqt1i0myrj.execute-api.ap-south-1.amazonaws.com/dev/quiz-1/",
+        param
       )
       .then(function(response) {
         // handle succs
-        console.log(response.data.success)
-        if(response.data.success){
-          toast.success('Questions added succesfully')
-        }
-        else{
-          toast.error('Problem while adding your questions. Please try again')
+        console.log(response.data.success);
+        if (response.data.success) {
+          toast.success("Questions added succesfully");
+          that.setState({
+            isUploading: false
+          });
+        } else {
+          toast.error("Problem while adding your questions. Please try again");
+          that.setState({
+            isUploading: false
+          });
         }
       })
       .catch(function(error) {
         // handle error
         console.log("error", error);
+        that.setState({
+          isUploading: false
+        });
       });
   };
 
+  handleOnChange = arg => {
+    let {type, value} =arg
+    if(type == 'quesName'){
+      this.setState(state => {
+        let {currentQuestion} = state
+        currentQuestion.name = value
+        return currentQuestion
+      })
+    }
+  }
+
   render() {
+    window.state = this.state
     return (
       <div>
         {this.state.quizTopic}
         <br />
         total questions added - {this.state.questions.length}
         <hr />
-        question : <textarea ref={ref => (this.questionNameRef = ref)} />
+        
+        question : <Form>
+          <TextArea placeholder="Write Question" onChange = {e => this.handleOnChange({type : 'quesName', value : e.target.value})}/>
+        </Form>
         <hr />a .{" "}
         <input
           type="text"
@@ -133,9 +170,15 @@ class AddQuestions extends Component {
         <hr />
         <hr />
         <hr />
-        <button onClick={() => this.handleUploadQuestion()}>
+        <Button
+          primary={!this.state.isUploading}
+          secondary={this.state.isUploading}
+          onClick={() => this.handleUploadQuestion()}
+          loading={this.state.isUploading}
+        >
           upload question
-        </button>
+        </Button>
+        <Button primary>Secondary</Button>
         <ToastContainer />
       </div>
     );

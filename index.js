@@ -8,6 +8,7 @@ import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import AddQuestions from "./components/addQuestions";
 import flux from "./flux/index.js";
 import GetQuestions from './components/getQuestions'
+import 'semantic-ui-css/semantic.min.css'
 
 
 
@@ -18,7 +19,7 @@ const getFlux = () => {
 export default function App1() {
   return (
     <Router>
-      <div>
+      <div className = 'container-fluid'>
         <button
           onClick={() => {
             getFlux();
