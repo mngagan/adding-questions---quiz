@@ -4,15 +4,24 @@ import { createStore } from "alt-utils/lib/decorators";
 import alt from "../alt";
 import _ from "underscore";
 import objectPath from "object-path";
-import addQuestionActions from "../actions/addQuestionActions";
+import quizActions from "../actions/quizActions";
 
 function getInitState() {
-  return {};
+  return {
+    quizTopic : '',
+    QuestionsAnswers : [],
+    quizInfo : [],
+    currentQuestion : {
+      question : '',
+      options : [],
+      anwser : 0
+    }
+  };
 }
 
-class addQuestionStore {
+class quizStore {
   constructor() {
-    this.bindActions(addQuestionActions);
+    this.bindActions(quizActions);
     this.state = getInitState();
   }
   onUpdateState = obj => {
@@ -20,6 +29,6 @@ class addQuestionStore {
   };
 }
 
-addQuestionStore.displayName = "addQuestionStore";
+quizStore.displayName = "quizStore";
 
-export default createStore(alt)(addQuestionStore);
+export default createStore(alt)(quizStore);

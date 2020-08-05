@@ -7,7 +7,7 @@ import { createActions } from "alt-utils/lib/decorators";
  * Actions for filters
  * @see "../stores/filter-store"
  */
-class addQuestionActions {
+class quizActions {
     constructor() {
         this.generateActions(
             "updateState",
@@ -15,4 +15,4 @@ class addQuestionActions {
     }
 }
 
-export default createActions(alt)(addQuestionActions);  
+export default createActions(alt)(quizActions);  

@@ -4,17 +4,8 @@ import "../style.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { validateQuestion } from "../utils/validateQuestion";
-import {toast} from '../utils/toast'
-
-let toastOptions = {
-  position: "bottom-right",
-  autoClose: 5000,
-  hideProgressBar: false,
-  closeOnClick: true,
-  pauseOnHover: true,
-  draggable: true,
-  progress: undefined
-};
+import { toast } from "../utils/toast";
+const axios = require("axios");
 
 class AddQuestions extends Component {
   constructor() {
@@ -28,13 +19,7 @@ class AddQuestions extends Component {
   }
 
   handleToast = arg => {
-    toast(arg)
-    // let { type, msg } = arg;
-    // if (type == "error") {
-    //   toast.error(msg, toastOptions);
-    // } else if (type == "success") {
-    //   toast.success(msg, toastOptions);
-    // }
+    toast(arg);
   };
 
   handleAddQuestion = () => {
@@ -50,7 +35,7 @@ class AddQuestions extends Component {
     };
     let isValid = validateQuestion(result);
     if (isValid.success) {
-      this.handleToast({ type: "success", msg: "Question added succesfully" });
+      toast.success('Questions added succesfully')
       let questions = this.state.questions;
       questions.push(result);
       this.setState({
@@ -59,7 +44,7 @@ class AddQuestions extends Component {
       this.resetAllValues();
       return;
     } else {
-      this.handleToast({ type: "error", msg: isValid.msg });
+      toast.error(isValid.msg)
       return;
     }
     console.log(result);
@@ -74,22 +59,29 @@ class AddQuestions extends Component {
   };
 
   handleUploadQuestion = () => {
-
-    let param1 = {
-      timestamp : new Date().getTime(),
-      ques : this.state.questions
-    }
-    var xhr = new XMLHttpRequest();
-    xhr.open(
-      "POST",
-      "https://pqt1i0myrj.execute-api.ap-south-1.amazonaws.com/dev/quiz-1/"
-    );
-    xhr.onreadystatechange = function(event) {
-      console.log(event.target.response);
-      document.getElementById("test").innerHTML = event.target.response;
+    let param = {
+      questions: this.state.questions,
+      topic : 'topic'
     };
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.send(JSON.stringify(param1));
+
+    axios
+      .post(
+        "https://pqt1i0myrj.execute-api.ap-south-1.amazonaws.com/dev/quiz-1/", param
+      )
+      .then(function(response) {
+        // handle succs
+        console.log(response.data.success)
+        if(response.data.success){
+          toast.success('Questions added succesfully')
+        }
+        else{
+          toast.error('Problem while adding your questions. Please try again')
+        }
+      })
+      .catch(function(error) {
+        // handle error
+        console.log("error", error);
+      });
   };
 
   render() {
@@ -150,4 +142,4 @@ class AddQuestions extends Component {
   }
 }
 
-export default AddQuestions
+export default AddQuestions;
