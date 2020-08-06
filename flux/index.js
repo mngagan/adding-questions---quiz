@@ -1,13 +1,16 @@
 // import addQuestionStore from './stores/addQuestionStore'
 // import addQuestionActions from './actions/addQuestionActions'
+import quizActions from './actions/quizActions'
+import quizStore from './stores/quizStore'
 
+let quizData = {
+    actions : quizActions,
+    store : quizStore
+  }
 
 
 const fluxObj = {
-  // addQuestionData : {
-  //   store : addQuestionStore,
-  //   actions : addQuestionActions
-  // }
+  quizData
 };
 
 window.flux = fluxObj;

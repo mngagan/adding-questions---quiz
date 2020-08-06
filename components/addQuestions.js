@@ -7,7 +7,16 @@ import { validateQuestion } from "../utils/validateQuestion";
 import { toast } from "../utils/toast";
 const axios = require("axios");
 import { Button } from "semantic-ui-react";
-import { Form, TextArea } from "semantic-ui-react";
+import { Form, TextArea, Select, Input } from "semantic-ui-react";
+import flux from "../flux";
+
+const getInitialCurrentQuestion = () => {
+  return {
+    name: "",
+    options: { o1: "", o2: "", o3: "", o4: "" },
+    answer: 0
+  };
+};
 
 class AddQuestions extends Component {
   constructor() {
@@ -16,48 +25,30 @@ class AddQuestions extends Component {
     this.state = {
       name: "React",
       questions: [],
-      quizTopic: "quiz topic",
+      quizTopic: "",
       isUploading: false,
-      currentQuestion : {
-        name : '',
-        options : []
-      }
+      currentQuestion: getInitialCurrentQuestion()
     };
   }
+  componentWillUnmount = () => {
+    flux.quizData.actions.updateState({
+      currentQuestion: this.state.currentQuestion
+    });
+  };
 
   handleToast = arg => {
     toast(arg);
   };
 
   handleAddQuestion = () => {
-    let result = {
-      name: this.state.currentQuestion.name,
-      ansList: [
-        this.optionA.value,
-        this.optionB.value,
-        this.optionC.value,
-        this.optionD.value
-      ],
-      anwser: this.selectAnswer.value
-    };
-    console.log(result)
-    
-    let isValid = validateQuestion(result);
-    if (isValid.success) {
-      toast.success("Questions added succesfully");
-      let questions = this.state.questions;
-      questions.push(result);
-      this.setState({
-        questions
-      });
-      this.resetAllValues();
-      return;
-    } else {
-      toast.error(isValid.msg);
-      return;
-    }
-    console.log(result);
+    let { currentQuestion, questions } = this.state;
+    questions.push(currentQuestion);
+    currentQuestion = getInitialCurrentQuestion();
+    this.setState({ questions, currentQuestion }, () => {
+      flux.quizData.actions.updateState({ questions, currentQuestion });
+    });
   };
+
   resetAllValues = () => {
     this.questionNameRef.ref.value = "";
     this.optionA.value = "";
@@ -107,66 +98,133 @@ class AddQuestions extends Component {
   };
 
   handleOnChange = arg => {
-    let {type, value} =arg
-    if(type == 'quesName'){
-      this.setState(state => {
-        let {currentQuestion} = state
-        currentQuestion.name = value
-        return currentQuestion
-      })
-    }
-  }
+    let { type, value } = arg;
+    console.log(arg);
+    // return
+    // if (type == "quesName") {
+    let { currentQuestion } = this.state;
+    this.setState(
+      state => {
+        switch (type) {
+          case "quesName":
+            currentQuestion.name = value;
+            break;
+          case "o1" || "o3" || "o4":
+            currentQuestion.options[type] = value;
+            break;
+          case "o2":
+            currentQuestion.options[type] = value;
+            break;
+          case "o3":
+            currentQuestion.options[type] = value;
+            break;
+          case "o4":
+            currentQuestion.options[type] = value;
+            break;
+          case "answer":
+            currentQuestion.answer = value;
+        }
+        return currentQuestion;
+      },
+      () => {
+        flux.quizData.actions.updateState({ currentQuestion });
+      }
+    );
+  };
 
   render() {
-    window.state = this.state
+    window.state = this.state;
+    let { currentQuestion } = this.state;
     return (
       <div>
-        {this.state.quizTopic}
+        <Input
+          size="huge"
+          fluid
+          transparent
+          placeholder="Topic name here"
+          value={this.state.quizTopic}
+          onChange={(e, { value }) => {
+            this.setState({
+              quizTopic : value
+            })
+          }}
+        />
         <br />
         total questions added - {this.state.questions.length}
         <hr />
-        
-        question : <Form>
-          <TextArea placeholder="Write Question" onChange = {e => this.handleOnChange({type : 'quesName', value : e.target.value})}/>
+        <Form>
+          <Form.Field inline>
+            <label>Question : </label>
+            <TextArea
+              placeholder="Write Question"
+              value={currentQuestion.name}
+              onChange={e =>
+                this.handleOnChange({ type: "quesName", value: e.target.value })
+              }
+            />
+          </Form.Field>
+          <Form.Group>
+            <Form.Input
+              label="1."
+              placeholder="1st option"
+              value={currentQuestion.options.o1}
+              width={8}
+              onChange={e =>
+                this.handleOnChange({ type: "o1", value: e.target.value })
+              }
+            />
+            <Form.Input
+              label="2."
+              placeholder="2nd option"
+              value={currentQuestion.options.o2}
+              width={8}
+              onChange={e =>
+                this.handleOnChange({ type: "o2", value: e.target.value })
+              }
+            />
+            <Form.Input
+              label="3."
+              placeholder="3rd option"
+              value={currentQuestion.options.o3}
+              width={8}
+              onChange={e =>
+                this.handleOnChange({ type: "o3", value: e.target.value })
+              }
+            />
+            <Form.Input
+              label="4."
+              placeholder="4th option"
+              value={currentQuestion.options.o4}
+              width={8}
+              onChange={e =>
+                this.handleOnChange({ type: "o4", value: e.target.value })
+              }
+            />
+          </Form.Group>
+          <Form.Field>
+            <label>Answer : </label>
+            <Select
+              placeholder="Select answer"
+              value={this.state.currentQuestion.answer}
+              width={4}
+              onChange={(e, { value }) => {
+                this.handleOnChange({ type: "answer", value });
+              }}
+              options={[
+                { key: "1", value: "1", text: "1" },
+                { key: "2", value: "2", text: "2" },
+                { key: "3", value: "3", text: "3" },
+                { key: "4", value: "4", text: "4" }
+              ]}
+            />
+          </Form.Field>
+
+          <Form.Field>
+            <Button primary onClick={() => this.handleAddQuestion()}>
+              Add question
+            </Button>
+          </Form.Field>
         </Form>
-        <hr />a .{" "}
-        <input
-          type="text"
-          ref={ref => {
-            this.optionA = ref;
-          }}
-        />
-        <br />b .{" "}
-        <input
-          type="text"
-          ref={ref => {
-            this.optionB = ref;
-          }}
-        />
-        <br />c .{" "}
-        <input
-          type="text"
-          ref={ref => {
-            this.optionC = ref;
-          }}
-        />
-        <br />d .{" "}
-        <input
-          type="text"
-          ref={ref => {
-            this.optionD = ref;
-          }}
-        />
-        <br />
-        answer :{" "}
-        <select ref={ref => (this.selectAnswer = ref)}>
-          <option value="a">a</option>
-          <option value="b">b</option>
-          <option value="c">c</option>
-          <option value="d">d</option>
-        </select>
-        <br />
-        <button onClick={() => this.handleAddQuestion()}>add question</button>
         <hr />
         <hr />
         <hr />
