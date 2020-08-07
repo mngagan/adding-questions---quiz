@@ -15,6 +15,11 @@ function getInitState() {
       question : '',
       options : [],
       anwser : 0
+    },
+    prevQuizInfo:{
+      fetched : false,
+      topics : {},
+      questions : []
     }
   };
 }
